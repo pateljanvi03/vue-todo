@@ -26,18 +26,20 @@
                 </div>
             </div>
 
-            <div class="inline-flex rounded-md shadow-sm ">
-                <a href="#" @click="filter = undefined" :class="filter == undefined ? 'text-blue-700' : 'text-gray-900'" class="py-2 px-4 text-sm font-medium bg-white rounded-l-lg border border-gray-200 hover:bg-gray-100 focus:z-10 focus:ring-2 focus:ring-blue-700 focus:text-blue-700">
-                    All
-                </a>
-                <a href="#" @click="filter = false" :class="filter == false ? 'text-blue-700' : 'text-gray-900'"  class="py-2 px-4 text-sm font-medium  bg-white border-t border-b border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-2 focus:ring-blue-700 focus:text-blue-700">
-                    Pending
-                </a>
-                <a href="#" @click="filter = true" :class="filter == true ? 'text-blue-700' : 'text-gray-900'"  class="py-2 px-4 text-sm font-medium text-gray-900 bg-white rounded-r-md border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-2 focus:ring-blue-700 focus:text-blue-700">
-                    Completed
-                </a>
+            <div>
+                <div class="inline-flex rounded-md shadow-sm mb-4">
+                    <a href="#" @click="filter = undefined" :class="filter == undefined ? 'text-blue-700' : 'text-gray-900'" class="py-2 px-4 text-sm font-medium bg-white rounded-l-lg border border-gray-200 hover:bg-gray-100 focus:z-10 focus:ring-2 focus:ring-blue-700 focus:text-blue-700">
+                        All
+                    </a>
+                    <a href="#" @click="filter = false" :class="filter == false ? 'text-blue-700' : 'text-gray-900'"  class="py-2 px-4 text-sm font-medium  bg-white border-t border-b border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-2 focus:ring-blue-700 focus:text-blue-700">
+                        Pending
+                    </a>
+                    <a href="#" @click="filter = true" :class="filter == true ? 'text-blue-700' : 'text-gray-900'"  class="py-2 px-4 text-sm font-medium text-gray-900 bg-white rounded-r-md border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-2 focus:ring-blue-700 focus:text-blue-700">
+                        Completed
+                    </a>
+                </div>
+                <button @click="clearTodo" class="text-gray-400 sm:pl-20">Clear</button>
             </div>
-            <button @click="clearTodo" class="text-gray-400 pl-20">Clear</button>
         </div>
     </div>
 
