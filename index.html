@@ -1,0 +1,76 @@
+<html>
+<head>
+    <title>Todo List</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+</head>
+<body>
+    <div id="app" class="min-h-full flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 bg-blue-100">
+        <div class="max-w-md w-full bg-white px-10 py-4 rounded">
+            <h2 class="text-center text-lg font-bold text-gray-600">Todos</h2>
+
+            <div class="flex my-4">
+                <input type="text" v-model="newTodoText" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" placeholder="Buy Coffee">
+                <button @click="addTodo" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2 ml-2" :disabled="newTodoText == ''">Add</button>
+            </div>
+
+            <div class="my-10">
+                <div class="flex items-center mb-2 group" v-for="(todo, index) in filteredTodos">
+                    <input :id="todo.id" v-model="todo.isCompleted"  aria-describedby="checkbox-1" type="checkbox" class="w-4 h-4 text-blue-600 bg-gray-100 rounded border-gray-300 focus:ring-blue-500">
+                    <label :for="todo.id" class="ml-3 text-sm font-medium text-gray-900 dark:text-gray-300 mr-4">
+                        {{ todo.title }}
+                    </label>
+                <svg class="w-4 h-4 cursor-pointer hidden group-hover:inline" @click="deleteTodo(index)" fill="none" stroke="red" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                </div>
+            </div>
+
+            <div class="inline-flex rounded-md shadow-sm ">
+                <a href="#" @click="filter = undefined" :class="filter == undefined ? 'text-blue-700' : 'text-gray-900'" class="py-2 px-4 text-sm font-medium bg-white rounded-l-lg border border-gray-200 hover:bg-gray-100 focus:z-10 focus:ring-2 focus:ring-blue-700 focus:text-blue-700">
+                    All
+                </a>
+                <a href="#" @click="filter = false" :class="filter == false ? 'text-blue-700' : 'text-gray-900'"  class="py-2 px-4 text-sm font-medium  bg-white border-t border-b border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-2 focus:ring-blue-700 focus:text-blue-700">
+                    Pending
+                </a>
+                <a href="#" @click="filter = true" :class="filter == true ? 'text-blue-700' : 'text-gray-900'"  class="py-2 px-4 text-sm font-medium text-gray-900 bg-white rounded-r-md border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-2 focus:ring-blue-700 focus:text-blue-700">
+                    Completed
+                </a>
+            </div>
+            <button @click="clearTodo" class="text-gray-400 pl-20">Clear</button>
+        </div>
+    </div>
+
+    <script>
+        new Vue({
+            el: "#app",
+            data: {
+                newTodoText: "",
+                id: 2,
+                todoList: [
+                    { id: 1, title: "Drink Water", isCompleted: true },
+                    { id: 2, title: "Learn Vue", isCompleted: false }
+                ],
+                filter: undefined
+            },
+            computed: {
+                filteredTodos() {
+                    return this.todoList.filter(x => this.filter == undefined || x.isCompleted == this.filter)
+                }
+            },
+            methods: {
+                addTodo() {
+                    this.todoList.push({ id: ++this.id, title: this.newTodoText, isCompleted: false });
+                    this.newTodoText = ""
+                },
+                deleteTodo(index) {
+                    this.todoList.splice(index, 1);
+                },
+                clearTodo() {
+                    this.todoList = [];
+                }
+            }
+        })
+    </script>
+</body>
+</html>
