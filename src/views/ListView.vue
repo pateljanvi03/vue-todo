@@ -112,10 +112,7 @@
 
             <div class="flex justify-between items-center w-full">
               <div class="flex flex-col">
-                <label
-                  class="ml-2 text-sm text-gray-900 dark:text-gray-300"
-                  :for="todo.id"
-                >
+                <label class="ml-2 text-sm text-gray-900" :for="todo.id">
                   {{ todo.body }}
                 </label>
                 <label class="text-gray-300 text-xs pt-1 px-2"
