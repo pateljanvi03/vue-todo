@@ -4,7 +4,7 @@
       <button
         @click="loginWithGoogle"
         type="submit"
-        class="mb-6 flex w-full cursor-pointer items-center justify-center rounded-lg border border-gray-300 p-3 text-sm font-medium tracking-wide text-gray-500 md:mb-0"
+        class="mb-6 flex w-full cursor-pointer items-center justify-center rounded-lg border border-gray-300 p-3 text-sm font-medium tracking-wide text-gray-500 md:mb-0 hover:bg-gray-100"
       >
         <svg
           class="mr-2 w-4"
