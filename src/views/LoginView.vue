@@ -1,5 +1,5 @@
 <template>
-  <div class="bg-white p-16">
+  <div class="bg-white rounded-lg p-16">
     <div class="w-56">
       <button
         @click="loginWithGoogle"
