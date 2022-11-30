@@ -1,19 +1,37 @@
 import { db } from "@/main";
 import { deleteDoc, doc, updateDoc } from "firebase/firestore";
+import dayjs from "dayjs";
+
+import relativeTime from "dayjs/plugin/relativeTime";
+dayjs.extend(relativeTime);
+import duration from "dayjs/plugin/duration";
+dayjs.extend(duration);
 
 /* eslint-disable */
 export class ToDo {
   isCompleted: boolean;
   body: string;
+  dueDate: Date;
   id: string;
   isSaving = false;
   userId: string;
 
-  constructor(body: string, isCompleted: boolean, id: string, userId: string) {
+  constructor(
+    body: string,
+    isCompleted: boolean,
+    dueDate: Date,
+    id: string,
+    userId: string
+  ) {
     this.body = body;
     this.isCompleted = isCompleted;
+    this.dueDate = dueDate;
     this.id = id;
     this.userId = this.userId;
+  }
+
+  get dueDateFormated() {
+    return this.dueDate ? dayjs(this.dueDate).format("DD/MM/YYYY") : " ";
   }
 
   async updateBody(body: string) {

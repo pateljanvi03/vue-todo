@@ -1,13 +1,7 @@
 /* eslint-disable */
 import { db } from "@/main";
-import {
-  addDoc,
-  collection,
-  deleteDoc,
-  getDocs,
-  query,
-  where,
-} from "firebase/firestore";
+import dayjs from "dayjs";
+import { addDoc, collection, getDocs, query, where } from "firebase/firestore";
 import { ToDo } from "./Todo";
 
 export class TodoList {
@@ -43,10 +37,19 @@ export class TodoList {
     const docRef = await addDoc(collection(db, "todos"), {
       body,
       isCompleted: false,
+      dueDate: dayjs().startOf("day").toDate(),
       userId: this.authUserId,
     });
 
-    this.lists.push(new ToDo(body, false, docRef.id, this.authUserId));
+    this.lists.push(
+      new ToDo(
+        body,
+        false,
+        dayjs().startOf("day").toDate(),
+        docRef.id,
+        this.authUserId
+      )
+    );
     this.isLoadingTask = false;
   }
 
@@ -62,7 +65,15 @@ export class TodoList {
     querySnapshot.forEach((doc) => {
       const data = doc.data();
       this.lists.push(
-        new ToDo(data.body, data.isCompleted, doc.id, this.authUserId)
+        new ToDo(
+          data.body,
+          data.isCompleted,
+          data.dueDate.seconds
+            ? dayjs(data.dueDate.toMillis()).startOf("day").toDate()
+            : dayjs().startOf("day").toDate(),
+          doc.id,
+          this.authUserId
+        )
       );
     });
 

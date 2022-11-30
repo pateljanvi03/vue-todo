@@ -6,11 +6,11 @@
     viewBox="0 0 24 24"
   >
     <circle
-      class="opacity-100"
+      class="opacity-60"
       cx="12"
       cy="12"
       r="10"
-      stroke="violet"
+      stroke="blue"
       stroke-width="4"
     />
     <path
