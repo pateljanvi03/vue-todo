@@ -37,29 +37,33 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { getAuth, signInWithPopup, GoogleAuthProvider } from "firebase/auth";
+import {
+  getAuth,
+  signInWithPopup,
+  GoogleAuthProvider,
+  signInWithCredential,
+} from "firebase/auth";
 import router from "../router";
+import { auth } from "@/main";
 
 export default Vue.extend({
   name: "LoginView",
   methods: {
     loginWithGoogle() {
-      const auth = getAuth();
       const provider = new GoogleAuthProvider();
 
       signInWithPopup(auth, provider)
-        .then((result) => {
+        .then(async (result) => {
+          console.log("result", result);
           // This gives you a Google Access Token. You can use it to access Google APIs.
           const credential = GoogleAuthProvider.credentialFromResult(result);
 
-          // The signed-in user info.
-          var token = credential.accessToken;
-          var user = result.user;
-          var userId = result.user.uid;
+          const idToken = credential.idToken;
+          const accessToken = credential.accessToken;
 
-          // console.log(token);
-          // console.log(user);
-          // console.log(userId);
+          localStorage.setItem("idToken", idToken);
+          localStorage.setItem("accessToken", accessToken);
+
           this.$router.push({ name: "list" });
         })
         .catch((error) => {

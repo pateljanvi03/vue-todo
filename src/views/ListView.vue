@@ -1,25 +1,30 @@
 <template>
   <div class="font-sans">
     <div
-      class="flex justify-between items-center w-96 bg-white rounded-lg py-3 px-3 shadow-2xl"
+      class="flex justify-between items-center w-96 bg-white rounded-t-lg py-3 px-3 shadow-2xl"
     >
-      <div class="flex items-center">
+      <div class="flex items-center" v-if="isPageReady">
         <img :src="authUser.photoURL" class="rounded-full h-8 w-8" />
         <label class="ml-2">{{ authUser.displayName }} </label>
       </div>
 
-      <div>
+      <div v-if="isPageReady">
         <button
           class="text-white bg-violet-600 font-medium rounded-lg text-sm py-2 px-3 ml-2 hover:bg-violet-700"
+          @click="logOut"
         >
           Logout
         </button>
       </div>
+
+      <div class="w-full flex justify-center" v-if="!isPageReady">
+        <Loader />
+      </div>
     </div>
 
     <div
+      class="w-96 bg-white h-auto mt-5 shadow-2xl rounded-b-lg"
       v-if="todoList"
-      class="w-96 bg-white h-auto mt-5 rounded-lg shadow-2xl"
     >
       <!-- Box Header -->
       <div class="bg-slate-100 px-4 py-2">
@@ -55,31 +60,21 @@
       </div>
 
       <!-- Box Lists -->
+
       <div
-        v-if="this.todoList.isLoadingData == true"
+        v-if="todoList && todoList.isLoadingData == true"
         class="flex justify-center my-2"
       >
-        <svg
-          class="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-          viewBox="0 0 24 24"
-        >
-          <circle
-            class="opacity-100"
-            cx="12"
-            cy="12"
-            r="10"
-            stroke="violet"
-            stroke-width="4"
-          />
-          <path
-            class="opacity-75"
-            fill="currentColor"
-            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-          />
-        </svg>
+        <Loader />
       </div>
+
+      <div
+        v-else-if="todoList.filteredTodos.length == 0"
+        class="flex justify-center item-center py-3"
+      >
+        <label> No tasks </label>
+      </div>
+
       <div v-else>
         <div class="p-3">
           <div v-if="todoList.lists.length > 0" class="flex justify-between">
@@ -149,10 +144,7 @@
             </div>
           </div>
 
-          <div
-            v-if="this.todoList.isLoadingTask"
-            class="flex justify-center my-2"
-          >
+          <div v-if="todoList.isLoadingTask" class="flex justify-center my-2">
             <svg
               class="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
               xmlns="http://www.w3.org/2000/svg"
@@ -178,7 +170,7 @@
       </div>
 
       <!-- Box Footer -->
-      <div class="px-3 py-2 bg-slate-100">
+      <div class="px-3 py-2 bg-slate-100 rounded-b-lg">
         <div v-if="todoList.lists.length > 0" class="flex justify-between">
           <div class="inline-flex">
             <a
@@ -234,14 +226,25 @@
 import Vue from "vue";
 import { TodoList } from "@/class/TodoList";
 import { doc, updateDoc } from "firebase/firestore";
-import { db } from "@/main";
-import { getAuth } from "firebase/auth";
+import { db, auth } from "@/main";
+import {
+  getAuth,
+  GoogleAuthProvider,
+  signInWithCredential,
+  signOut,
+} from "firebase/auth";
+import Loader from "@/components/Loader.vue";
 
 export default Vue.extend({
   name: "ListView",
 
+  components: {
+    Loader,
+  },
+
   data() {
     return {
+      isPageReady: false,
       todoList: undefined,
       newTaskBody: "",
       index: -1,
@@ -250,21 +253,39 @@ export default Vue.extend({
   },
 
   async mounted() {
-    this.loadData();
+    await this.loadData();
   },
 
   methods: {
     async loadData() {
-      setTimeout(async () => {
-        const auth = getAuth();
-        if (!auth.currentUser) {
-          this.$router.push({ name: "login" });
+      if (auth.currentUser) {
+        this.initData();
+      } else {
+        const idToken = localStorage.getItem("idToken");
+        const accessToken = localStorage.getItem("accessToken");
+
+        if (idToken && accessToken) {
+          try {
+            const credential = GoogleAuthProvider.credential(
+              idToken,
+              accessToken
+            );
+            await signInWithCredential(auth, credential);
+            this.initData();
+          } catch (err) {
+            this.$router.push({ name: "login" });
+          }
         } else {
-          this.authUser = auth.currentUser;
-          this.todoList = new TodoList(auth.currentUser.uid);
-          this.todoList.loadDataFromDatabase();
+          this.$router.push({ name: "login" });
         }
-      }, 1000);
+      }
+    },
+
+    initData() {
+      this.authUser = auth.currentUser;
+      this.todoList = new TodoList(auth.currentUser.uid);
+      this.isPageReady = true;
+      this.todoList.loadDataFromDatabase();
     },
 
     async addtoTodo() {
@@ -292,19 +313,28 @@ export default Vue.extend({
     },
 
     async clearComletedTasks() {
-      await this.todoList.clearCompletedTodo();
+      if (confirm("Are you sure you wants to delete all the comleted tasks?")) {
+        await this.todoList.clearCompletedTodo();
+      }
     },
 
     async deleteDocument(index: number) {
-      await this.todoList.deleteTodo(index);
+      if (confirm("Are you sure you wants to delete?")) {
+        await this.todoList.deleteTodo(index);
+      }
     },
 
     async clearTodo() {
-      await this.todoList.deleteAllTodos();
+      if (confirm("Are you sure you wants to delete the list?")) {
+        await this.todoList.deleteAllTodos();
+      }
     },
 
-    logout() {
-      //
+    async logOut() {
+      await signOut(auth);
+      localStorage.clear();
+
+      this.$router.push({ name: "login" });
     },
   },
 });
